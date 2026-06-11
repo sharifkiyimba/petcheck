@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Diagnosis Results — PetCheck{% endblock %}
+
+{% block content %}
+<section class="results-page">
+  {% if result %}
+  
+  {% if result.error %}
+  <div style="background: #fff5f5; border: 2px solid #e74c3c; border-radius: 20px; padding: 2rem; text-align: center;">
+    <div style="font-size: 4rem;">⚠️</div>
+    <h2 style="color: #c0392b;">Error</h2>
+    <p>{{ result.message }}</p>
+    <a href="/upload" class="btn-primary" style="margin-top: 1rem;">Try Again</a>
+  </div>
+  {% else %}
+  
+  <div class="results-header">
+    <h1>Diagnosis Complete 🐾</h1>
+    <p>Here's what our AI found based on your pet's photo.</p>
+    {% if result.mode == 'demo' %}
+    <div class="demo-banner" style="background: #fff3cd; padding: 0.5rem; border-radius: 8px; margin-top: 1rem;">
+      ℹ️ Demo Mode - Train the AI for real predictions
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="results-grid">
+    <!-- Main result card -->
+    <div class="result-main">
+      <div class="result-disease-card {% if result.disease == 'Healthy' %}healthy{% else %}warning{% endif %}">
+        <div class="result-icon">{% if result.disease == 'Healthy' %}✅{% else %}⚠️{% endif %}</div>
+        <h2>{{ result.disease }}</h2>
+        <div class="confidence-bar">
+          <div class="conf-label">AI Confidence</div>
+          <div class="conf-track">
+            <div class="conf-fill" style="width: {{ result.confidence }}%"></div>
+          </div>
+          <div class="conf-pct">{{ result.confidence }}%</div>
+        </div>
+      </div>
+
+      <div class="advice-box">
+        <h3>💊 Home Care Advice</h3>
+        <p>{{ result.advice }}</p>
+      </div>
+
+      <div class="disclaimer">
+        ⚠️ <strong>Important:</strong> This is an AI-based screening tool, not a professional diagnosis. Always consult a qualified veterinarian for proper treatment.
+      </div>
+    </div>
+
+    <!-- Side panel -->
+    <div class="result-side">
+      <div class="other-predictions">
+        <h3>Other Possibilities</h3>
+        {% for pred in result.all_predictions %}
+        {% if pred.disease != result.disease %}
+        <div class="pred-row">
+          <span class="pred-name">{{ pred.disease }}</span>
+          <div class="pred-bar-track">
+            <div class="pred-bar-fill" style="width: {{ pred.confidence }}%"></div>
+          </div>
+          <span class="pred-pct">{{ pred.confidence }}%</span>
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+
+      <div class="result-actions">
+        <a href="/vets" class="btn-primary">📍 Find a Vet Nearby</a>
+        <a href="/upload" class="btn-ghost">🔄 Try Another Photo</a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  
+  {% else %}
+  <div class="no-result">
+    <div class="no-result-icon">🐾</div>
+    <h2>No diagnosis yet</h2>
+    <p>Upload a photo of your pet to get started.</p>
+    <a href="/upload" class="btn-primary">Start Diagnosis →</a>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

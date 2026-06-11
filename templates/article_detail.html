@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% block title %}{{ article.title if article else 'Article' }} — PetCheck{% endblock %}
+
+{% block content %}
+<section class="article-detail-page">
+
+  <div class="article-back">
+    <a href="/articles">← Back to Articles</a>
+  </div>
+
+  {% if article %}
+  <div class="article-detail-inner">
+    <div class="article-detail-badge">{{ article.category or 'General' }}</div>
+    <h1>{{ article.title }}</h1>
+    <div class="article-detail-meta">
+      <span>📅 {{ article.date }}</span>
+      <span>⏱ {{ article.read_time }} min read</span>
+    </div>
+    <div class="article-body">
+      {{ article.content | safe }}
+    </div>
+  </div>
+  {% else %}
+  <!-- Static article content for demo -->
+  <div class="article-detail-inner">
+    <div class="article-detail-badge" id="articleBadge"></div>
+    <h1 id="articleTitle"></h1>
+    <div class="article-detail-meta">
+      <span id="articleDate"></span>
+      <span id="articleRead"></span>
+    </div>
+    <div class="article-body" id="articleBody"></div>
+  </div>
+
+  <script>
+  const articles = {
+    1: {
+      badge: "Dogs", title: "How to Spot Mange in Dogs Early",
+      date: "📅 01 Jan 2025", read: "⏱ 4 min read",
+      body: `
+        <p>Mange is one of the most common skin diseases affecting dogs in Uganda, particularly in areas like Entebbe where pets may come into contact with stray animals. It is caused by microscopic mites that burrow into the skin.</p>
+        <h3>Types of Mange</h3>
+        <p><strong>Sarcoptic mange (scabies)</strong> is highly contagious and can spread to humans. <strong>Demodectic mange</strong> is less contagious and usually affects puppies or dogs with weak immune systems.</p>
+        <h3>Early Warning Signs</h3>
+        <ul>
+          <li>Intense itching and scratching</li>
+          <li>Hair loss, especially around the eyes, ears, and elbows</li>
+          <li>Red, crusty, or scaly skin patches</li>
+          <li>Sores and blisters from scratching</li>
+        </ul>
+        <h3>Home Care Tips</h3>
+        <p>Keep your dog clean and dry. Wash all bedding in hot water. Avoid contact with other dogs until treated. Visit a vet for proper antiparasitic medication — mange can worsen quickly without treatment.</p>
+        <h3>Prevention</h3>
+        <p>Regular grooming, a healthy diet, and avoiding contact with stray animals are the best ways to prevent mange. Annual vet checkups also help catch skin issues early.</p>
+      `
+    },
+    2: {
+      badge: "Cats", title: "Eye Infections in Cats: Causes & Treatment",
+      date: "📅 05 Jan 2025", read: "⏱ 3 min read",
+      body: `
+        <p>Eye infections, especially conjunctivitis, are among the most frequently seen conditions in cats. The good news is that most cases can be managed effectively with proper care.</p>
+        <h3>Common Causes</h3>
+        <ul>
+          <li>Bacterial infections (most common)</li>
+          <li>Viral infections such as feline herpesvirus</li>
+          <li>Dust, smoke, or chemical irritants</li>
+          <li>Foreign objects in the eye</li>
+        </ul>
+        <h3>Symptoms to Watch For</h3>
+        <p>Watery or yellow-green discharge from the eye, redness, swelling of the eyelids, squinting or keeping the eye closed, and pawing at the face.</p>
+        <h3>Safe Home Care</h3>
+        <p>Gently wipe discharge with a clean, damp cloth. Use a separate cloth for each eye to avoid spreading infection. Do not apply human eye drops — they can be harmful to cats. See a vet for antibiotic drops or antiviral medication.</p>
+      `
+    },
+    3: {
+      badge: "Nutrition", title: "Feeding Your Dog the Right Diet in Uganda",
+      date: "📅 10 Jan 2025", read: "⏱ 5 min read",
+      body: `
+        <p>In Uganda, many pet owners feed their dogs leftover table food. While this is economical, not all human foods are safe for dogs. Understanding what your dog needs can prevent many common health problems.</p>
+        <h3>Safe Local Foods for Dogs</h3>
+        <ul>
+          <li>Plain cooked rice and maize — good source of carbohydrates</li>
+          <li>Boiled chicken or beef (no bones, no salt)</li>
+          <li>Cooked sweet potatoes and carrots</li>
+          <li>Eggs — great source of protein</li>
+        </ul>
+        <h3>Foods to Avoid</h3>
+        <ul>
+          <li>Onions and garlic — toxic to dogs</li>
+          <li>Avocado — contains persin which is harmful</li>
+          <li>Bones — can splinter and cause internal injuries</li>
+          <li>Sugary foods and drinks</li>
+          <li>Raw cassava — contains cyanide compounds</li>
+        </ul>
+        <h3>Recommended Feeding Schedule</h3>
+        <p>Puppies (under 6 months): 3–4 small meals per day. Adult dogs: 2 meals per day. Always provide fresh, clean water. Consult your vet for portion sizes based on your dog's breed and weight.</p>
+      `
+    },
+    4: {
+      badge: "Prevention", title: "Vaccination Schedule for Dogs & Cats",
+      date: "📅 15 Jan 2025", read: "⏱ 4 min read",
+      body: `
+        <p>Vaccinations are the single most important preventive measure you can take for your pet's health. They protect against deadly diseases that are common in Uganda.</p>
+        <h3>Core Vaccines for Dogs</h3>
+        <ul>
+          <li><strong>Rabies</strong> — required by law in Uganda. First dose at 3 months, then annually.</li>
+          <li><strong>Distemper (DHPPi)</strong> — protects against 4 diseases. Start at 6–8 weeks, booster every year.</li>
+          <li><strong>Parvovirus</strong> — highly fatal in puppies. Included in DHPPi vaccine.</li>
+        </ul>
+        <h3>Core Vaccines for Cats</h3>
+        <ul>
+          <li><strong>Rabies</strong> — first dose at 3 months, then annually.</li>
+          <li><strong>FVRCP</strong> — protects against feline viral rhinotracheitis, calicivirus, and panleukopenia. Start at 6–8 weeks.</li>
+        </ul>
+        <h3>Where to Vaccinate in Entebbe</h3>
+        <p>Visit any of the verified vet clinics listed on PetCheck's Vet Finder. Most vaccines in Uganda cost between UGX 20,000–50,000 per dose.</p>
+      `
+    },
+    5: {
+      badge: "Dogs", title: "Understanding Ear Infections in Dogs",
+      date: "📅 20 Jan 2025", read: "⏱ 3 min read",
+      body: `
+        <p>Ear infections (otitis) are a very common reason pet owners visit vets. Dogs with long, floppy ears like cocker spaniels are especially prone, but any dog can develop one.</p>
+        <h3>Causes</h3>
+        <ul>
+          <li>Bacterial or yeast overgrowth</li>
+          <li>Water trapped in the ear after bathing or swimming</li>
+          <li>Ear mites (common in puppies)</li>
+          <li>Allergies or hormonal imbalances</li>
+        </ul>
+        <h3>Signs of an Ear Infection</h3>
+        <p>Head shaking, scratching at the ear, dark or yellow discharge, bad smell from the ear, redness inside the ear flap, and whimpering when the ear is touched.</p>
+        <h3>What NOT to Do</h3>
+        <p>Never insert cotton swabs or any object into the ear canal. This can push debris further in and cause damage. Do not use hydrogen peroxide — it can irritate the ear lining.</p>
+        <h3>Prevention</h3>
+        <p>Clean your dog's ears monthly with a vet-approved ear cleaner. Dry ears thoroughly after baths. Check ears weekly for unusual smells or discharge.</p>
+      `
+    },
+    6: {
+      badge: "Cats", title: "Ringworm in Cats: Is It Dangerous to Humans?",
+      date: "📅 25 Jan 2025", read: "⏱ 4 min read",
+      body: `
+        <p>Despite its name, ringworm has nothing to do with worms. It is a fungal infection caused by dermatophytes and is one of the few pet diseases that can spread to people (zoonotic).</p>
+        <h3>Symptoms in Cats</h3>
+        <ul>
+          <li>Circular patches of hair loss</li>
+          <li>Scaly, crusty skin</li>
+          <li>Brittle or broken hairs around patches</li>
+          <li>Itching (though some cats show no symptoms at all)</li>
+        </ul>
+        <h3>Can It Spread to Humans?</h3>
+        <p>Yes. You can get ringworm from an infected cat through direct contact. In humans, it appears as a red, ring-shaped, itchy patch on the skin. Children and people with weak immune systems are most at risk.</p>
+        <h3>Treatment</h3>
+        <p>Antifungal shampoos, creams, or oral medication prescribed by a vet. Treatment usually takes 6–8 weeks. All bedding, grooming tools, and surfaces should be thoroughly cleaned and disinfected.</p>
+        <h3>Prevention</h3>
+        <p>Wash hands after handling your cat. Keep new cats isolated for 2 weeks before introducing them to other pets. Regular grooming and vet checkups help detect ringworm early.</p>
+      `
+    }
+  };
+
+  const id = parseInt(window.location.pathname.split('/').pop()) || 1;
+  const a = articles[id] || articles[1];
+  document.getElementById('articleBadge').textContent = a.badge;
+  document.getElementById('articleTitle').textContent = a.title;
+  document.getElementById('articleDate').textContent = a.date;
+  document.getElementById('articleRead').textContent = a.read;
+  document.getElementById('articleBody').innerHTML = a.body;
+  document.title = a.title + ' — PetCheck';
+  </script>
+  {% endif %}
+
+  <!-- Related / CTA -->
+  <div class="article-cta">
+    <h3>Think your pet might be affected?</h3>
+    <p>Upload a photo for an instant AI diagnosis.</p>
+    <a href="/upload" class="btn-primary">Diagnose My Pet →</a>
+  </div>
+
+</section>
+{% endblock %}

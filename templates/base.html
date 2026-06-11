@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes"/>
+  <title>{% block title %}PetCheck{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <!-- Modern Navbar with Hamburger -->
+  <nav class="navbar">
+    <a href="/" class="logo">Pet<span>Check</span></a>
+    
+    <!-- Desktop Navigation -->
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/upload">Diagnose</a></li>
+      <li><a href="/articles">Articles</a></li>
+      <li><a href="/forum">Forum</a></li>
+      <li><a href="/vets">Find a Vet</a></li>
+      {% if session.get('user_id') %}
+        <li><a href="/profile">👤 {{ session.get('user_name', 'Profile') }}</a></li>
+        <li><a href="/logout" class="btn-nav">Log Out</a></li>
+      {% else %}
+        <li><a href="/login">Log In</a></li>
+        <li><a href="/register" class="btn-nav">Sign Up Free →</a></li>
+      {% endif %}
+    </ul>
+    
+    <!-- Hamburger Button -->
+    <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+      <i class="fas fa-bars"></i>
+    </button>
+  </nav>
+  
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <button class="close-icon" id="closeMenuBtn"><i class="fas fa-times"></i></button>
+    <a href="/">Home</a>
+    <a href="/upload">Diagnose</a>
+    <a href="/articles">Articles</a>
+    <a href="/forum">Forum</a>
+    <a href="/vets">Find a Vet</a>
+    {% if session.get('user_id') %}
+      <a href="/profile">Profile</a>
+      <a href="/logout">Log Out</a>
+    {% else %}
+      <a href="/login">Log In</a>
+      <a href="/register">Sign Up Free →</a>
+    {% endif %}
+  </div>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <main>{% block content %}{% endblock %}</main>
+
+   <!-- Professional Modern Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-main">
+        <!-- Left side - Logo and tagline -->
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <i class="fas fa-paw"></i>
+            <span>Pet</span><span>Check</span>
+          </div>
+          <p class="footer-tagline">AI-powered veterinary guidance for Uganda's pet owners.</p>
+        </div>
+        
+        <!-- Right side - Weather and Search -->
+        <div class="footer-info">
+          <div class="footer-weather">
+            <div class="weather-icon">
+              <i class="fas fa-sun"></i>
+            </div>
+            <span class="weather-temp">78°F</span>
+            <span class="weather-condition">Partly sunny</span>
+          </div>
+          <div class="footer-search">
+            <input type="text" placeholder="Search articles..." aria-label="Search">
+            <button type="button"><i class="fas fa-search"></i></button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <div class="copyright">
+          © 2026 PetCheck · UIICT Group 46
+        </div>
+        <div class="footer-links">
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+          <a href="#">Contact</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Hamburger menu functionality
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const mobileOverlay = document.getElementById('mobileOverlay');
+    const closeMenuBtn = document.getElementById('closeMenuBtn');
+    
+    function openMenu() {
+      mobileMenu.classList.add('active');
+      mobileOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function closeMenu() {
+      mobileMenu.classList.remove('active');
+      mobileOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    
+    if (hamburgerBtn) hamburgerBtn.addEventListener('click', openMenu);
+    if (closeMenuBtn) closeMenuBtn.addEventListener('click', closeMenu);
+    if (mobileOverlay) mobileOverlay.addEventListener('click', closeMenu);
+    
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && mobileMenu.classList.contains('active')) {
+        closeMenu();
+      }
+    });
+  </script>
+  
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

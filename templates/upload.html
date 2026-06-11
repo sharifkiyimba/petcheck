@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Diagnose Your Pet — PetCheck{% endblock %}
+
+{% block content %}
+<section class="upload-page">
+  <div class="upload-header">
+    <h1>Upload Your Pet's Photo</h1>
+    <p>Supported: JPG, PNG · Max size: 16MB</p>
+  </div>
+
+  <div class="upload-container">
+    <!-- Drop zone -->
+    <div class="drop-zone" id="dropZone">
+      <div class="drop-icon">🐾</div>
+      <p class="drop-text">Drag & drop your pet's photo here</p>
+      <p class="drop-sub">or</p>
+      <label class="btn-primary" for="fileInput">Browse Files</label>
+      <input type="file" id="fileInput" accept="image/jpeg,image/png,image/jpg" hidden />
+    </div>
+
+    <!-- Preview -->
+    <div class="preview-area" id="previewArea" style="display:none;">
+      <img id="previewImg" src="" alt="Preview" />
+      <div class="preview-actions">
+        <button class="btn-ghost" id="removeFile">✕ Remove</button>
+        <button class="btn-primary" id="analyzeBtn">Analyze Now →</button>
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    <div class="analyzing" id="analyzingState" style="display:none;">
+      <div class="paw-spinner">🐾</div>
+      <p>Analyzing your pet...</p>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+  </div>
+
+  <!-- Tips -->
+  <div class="upload-tips">
+    <h3>📸 Tips for a good photo</h3>
+    <ul>
+      <li>Make sure the affected area is clearly visible</li>
+      <li>Use good lighting — avoid blurry or dark images</li>
+      <li>Take the photo from multiple angles if possible</li>
+      <li>For skin issues, part the fur to show the skin</li>
+    </ul>
+  </div>
+</section>
+
+<script>
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const previewArea = document.getElementById('previewArea');
+const previewImg = document.getElementById('previewImg');
+const analyzingState = document.getElementById('analyzingState');
+const progressFill = document.getElementById('progressFill');
+let selectedFile = null;
+
+fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('dragover');
+  handleFile(e.dataTransfer.files[0]);
+});
+
+function handleFile(file) {
+  if (!file) return;
+  selectedFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    previewImg.src = e.target.result;
+    dropZone.style.display = 'none';
+    previewArea.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+document.getElementById('removeFile').addEventListener('click', () => {
+  selectedFile = null;
+  fileInput.value = '';
+  previewArea.style.display = 'none';
+  dropZone.style.display = 'flex';
+});
+
+document.getElementById('analyzeBtn').addEventListener('click', async () => {
+  if (!selectedFile) return;
+  previewArea.style.display = 'none';
+  analyzingState.style.display = 'flex';
+
+  let progress = 0;
+  const interval = setInterval(() => {
+    progress += 10;
+    if (progress > 90) progress = 90;
+    progressFill.style.width = progress + '%';
+  }, 200);
+
+  const formData = new FormData();
+  formData.append('file', selectedFile);
+
+  try {
+    const response = await fetch('/diagnose', { method: 'POST', body: formData });
+    const result = await response.json();
+    clearInterval(interval);
+    progressFill.style.width = '100%';
+    setTimeout(() => { window.location.href = '/results'; }, 500);
+  } catch (err) {
+    clearInterval(interval);
+    alert('Error analyzing image. Please try again.');
+    analyzingState.style.display = 'none';
+    previewArea.style.display = 'block';
+  }
+});
+</script>
+{% endblock %}

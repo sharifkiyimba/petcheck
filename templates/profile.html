@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}My Profile — PetCheck{% endblock %}
+
+{% block content %}
+<section class="profile-page">
+
+  <!-- Header -->
+  <div class="profile-header">
+    <div class="profile-avatar">{{ user.name[0].upper() }}</div>
+    <div class="profile-info">
+      <h1>{{ user.name }}</h1>
+      <span class="role-badge">{{ '🩺 Vet Doctor' if user.role == 'vet' else '🐾 Pet Owner' }}</span>
+      <p class="profile-email">{{ user.email }}</p>
+    </div>
+    <a href="/logout" class="btn-ghost">Log Out</a>
+  </div>
+
+  <!-- Stats -->
+  <div class="profile-stats">
+    <div class="stat-card">
+      <div class="stat-num">{{ diagnoses|length }}</div>
+      <div class="stat-label">Diagnoses</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">{{ pets|length }}</div>
+      <div class="stat-label">Pets Registered</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">🐾</div>
+      <div class="stat-label">PetCheck Member</div>
+    </div>
+  </div>
+
+  <div class="profile-grid">
+
+    <!-- My Pets -->
+    <div class="profile-section">
+      <div class="section-header">
+        <h2>My Pets</h2>
+        <button class="btn-primary" id="addPetBtn" style="padding:0.4rem 1rem;font-size:0.85rem">+ Add Pet</button>
+      </div>
+
+      <!-- Add pet form (hidden by default) -->
+      <form method="POST" action="/add-pet" class="add-pet-form" id="addPetForm" style="display:none">
+        <div class="inline-form">
+          <input type="text" name="name" placeholder="Pet name" required />
+          <select name="species">
+            <option value="dog">🐕 Dog</option>
+            <option value="cat">🐈 Cat</option>
+          </select>
+          <input type="text" name="breed" placeholder="Breed (optional)" />
+          <input type="number" name="age" placeholder="Age" min="0" max="30" />
+          <button type="submit" class="btn-primary" style="padding:0.5rem 1rem">Save</button>
+        </div>
+      </form>
+
+      {% if pets %}
+        <div class="pets-list">
+          {% for pet in pets %}
+          <div class="pet-item">
+            <span class="pet-icon">{{ '🐕' if pet[3] == 'dog' else '🐈' }}</span>
+            <div>
+              <strong>{{ pet[2] }}</strong>
+              <p>{{ pet[4] or 'Unknown breed' }} · {{ pet[5] or '?' }} yrs old</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="empty-state">No pets added yet. Add your first pet above!</p>
+      {% endif %}
+    </div>
+
+    <!-- Diagnosis History -->
+    <div class="profile-section">
+      <h2>Recent Diagnoses</h2>
+      {% if diagnoses %}
+        <div class="diagnosis-list">
+          {% for d in diagnoses %}
+          <div class="diagnosis-item">
+            <div class="diag-icon">🔬</div>
+            <div class="diag-info">
+              <strong>{{ d[4] }}</strong>
+              <p>Confidence: {{ d[5] }}%</p>
+              <p class="diag-date">{{ d[7].strftime('%d %b %Y') if d[7] else '' }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="empty-state">No diagnoses yet. <a href="/upload">Upload a photo</a> to get started.</p>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+
+<script>
+document.getElementById('addPetBtn').addEventListener('click', () => {
+  const form = document.getElementById('addPetForm');
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+});
+</script>
+{% endblock %}

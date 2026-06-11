@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Community Forum — PetCheck{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto; padding: 2rem;">
+
+  <!-- Header -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 style="margin: 0 0 0.5rem 0;">🐾 Community Forum</h1>
+      <p style="margin: 0; color: #666;">Ask questions, share tips, and get advice from pet owners and vets.</p>
+    </div>
+    {% if session and session.get('user_id') %}
+      <button onclick="toggleForm()" style="background: #e0702a; color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: 600;">+ New Post</button>
+    {% else %}
+      <a href="/login" style="background: #e0702a; color: white; text-decoration: none; padding: 10px 20px; border-radius: 30px; font-weight: 600;">Log in to Post</a>
+    {% endif %}
+  </div>
+
+  <!-- New Post Form -->
+  {% if session and session.get('user_id') %}
+  <div id="newPostForm" style="display: none; background: #f5f0e8; padding: 20px; border-radius: 16px; margin-bottom: 30px;">
+    <h3 style="margin: 0 0 15px 0;">Create a New Post</h3>
+    <form method="POST" action="/forum/post">
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Title</label>
+        <input type="text" name="title" placeholder="e.g. My dog has been scratching a lot" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+      </div>
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Your Message</label>
+        <textarea name="body" rows="4" placeholder="Describe your pet's situation..." required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;"></textarea>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button type="button" onclick="toggleForm()" style="background: #ccc; border: none; padding: 8px 20px; border-radius: 8px; cursor: pointer;">Cancel</button>
+        <button type="submit" style="background: #e0702a; color: white; border: none; padding: 8px 20px; border-radius: 8px; cursor: pointer;">Post →</button>
+      </div>
+    </form>
+  </div>
+  {% endif %}
+
+  <!-- Forum Posts List -->
+  <div>
+    {% if posts and posts|length > 0 %}
+      {% for post in posts %}
+      {% set post_id = post[0] %}
+      {% set title = post[2] %}
+      {% set body = post[3] %}
+      {% set created_at = post[4] %}
+      {% set author_name = post[6] if post[6] else 'Anonymous' %}
+      {% set reply_count = post[7] if post[7] else 0 %}
+      
+      <a href="/forum/{{ post_id }}" style="display: block; text-decoration: none; color: inherit; background: white; border: 1px solid #eee; border-radius: 12px; padding: 20px; margin-bottom: 15px; transition: all 0.2s;">
+        <div style="display: flex; align-items: flex-start; gap: 15px;">
+          <div style="width: 50px; height: 50px; background: #e0702a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; flex-shrink: 0;">
+            {{ author_name[0].upper() if author_name else '?' }}
+          </div>
+          <div style="flex: 1;">
+            <h3 style="margin: 0 0 8px 0; font-size: 18px;">{{ title }}</h3>
+            <p style="margin: 0 0 8px 0; color: #666;">{{ body[:150] }}{% if body|length > 150 %}...{% endif %}</p>
+            <div style="display: flex; gap: 15px; font-size: 12px; color: #999;">
+              <span>👤 {{ author_name }}</span>
+              <span>💬 {{ reply_count }} replies</span>
+              <span>📅 {{ created_at.strftime('%d %b %Y') if created_at else '' }}</span>
+            </div>
+          </div>
+          <div style="color: #e0702a; font-size: 20px;">→</div>
+        </div>
+      </a>
+      {% endfor %}
+    {% else %}
+      <!-- No posts message -->
+      <div style="text-align: center; padding: 60px 20px; background: white; border-radius: 16px;">
+        <div style="font-size: 50px; margin-bottom: 15px;">🐾</div>
+        <h3 style="margin: 0 0 10px 0;">No posts yet</h3>
+        <p style="color: #666;">Be the first to start a conversation!</p>
+        {% if session and session.get('user_id') %}
+          <button onclick="toggleForm()" style="background: #e0702a; color: white; border: none; padding: 10px 24px; border-radius: 30px; cursor: pointer; margin-top: 15px; font-weight: 600;">+ Create First Post</button>
+        {% else %}
+          <a href="/login" style="background: #e0702a; color: white; text-decoration: none; padding: 10px 24px; border-radius: 30px; display: inline-block; margin-top: 15px;">Log in to Post</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<script>
+function toggleForm() {
+  var form = document.getElementById('newPostForm');
+  if (form) {
+    if (form.style.display === 'none') {
+      form.style.display = 'block';
+    } else {
+      form.style.display = 'none';
+    }
+  }
+}
+</script>
+{% endblock %}

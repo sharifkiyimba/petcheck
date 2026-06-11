@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Forum Post — PetCheck{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto; padding: 2rem;">
+
+  <div style="margin-bottom: 20px;">
+    <a href="/forum" style="color: #e0702a; text-decoration: none;">← Back to Forum</a>
+  </div>
+
+  {% if post %}
+  {% set post_id = post[0] %}
+  {% set title = post[2] %}
+  {% set body = post[3] %}
+  {% set created_at = post[4] %}
+  {% set author_name = post[6] if post[6] else 'Anonymous' %}
+  
+  <!-- Post Content -->
+  <div style="background: white; border-radius: 16px; padding: 30px; margin-bottom: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+      <div style="width: 60px; height: 60px; background: #e0702a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold;">
+        {{ author_name[0].upper() if author_name else '?' }}
+      </div>
+      <div>
+        <h1 style="margin: 0 0 5px 0; font-size: 24px;">{{ title }}</h1>
+        <div style="display: flex; gap: 15px; font-size: 13px; color: #999;">
+          <span>👤 {{ author_name }}</span>
+          <span>📅 {{ created_at.strftime('%d %b %Y at %H:%M') if created_at else '' }}</span>
+        </div>
+      </div>
+    </div>
+    <div style="line-height: 1.6; color: #333; font-size: 16px; white-space: pre-wrap;">
+      {{ body }}
+    </div>
+  </div>
+  {% else %}
+  <div style="background: white; border-radius: 16px; padding: 40px; text-align: center;">
+    <p>Post not found.</p>
+    <a href="/forum" style="background: #e0702a; color: white; text-decoration: none; padding: 10px 24px; border-radius: 8px; display: inline-block; margin-top: 15px;">Back to Forum</a>
+  </div>
+  {% endif %}
+
+  <!-- Replies Section -->
+  <div style="background: #f9f9f9; border-radius: 16px; padding: 25px;">
+    <h3 style="margin: 0 0 20px 0;">{{ replies|length if replies else 0 }} Replies</h3>
+    
+    {% if replies and replies|length > 0 %}
+      {% for reply in replies %}
+      {% set reply_author = reply[6] if reply[6] else 'Anonymous' %}
+      {% set reply_role = reply[7] if reply[7] else '' %}
+      {% set reply_body = reply[3] %}
+      {% set reply_date = reply[4] %}
+      
+      <div style="display: flex; gap: 15px; margin-bottom: 20px; padding: 15px; background: white; border-radius: 12px;">
+        <div style="width: 45px; height: 45px; background: #e0702a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">
+          {{ reply_author[0].upper() if reply_author else '?' }}
+        </div>
+        <div style="flex: 1;">
+          <div style="font-weight: 600; margin-bottom: 5px;">
+            {{ reply_author }}
+            {% if reply_role == 'vet' %}
+              <span style="background: #e0702a20; color: #e0702a; padding: 2px 8px; border-radius: 20px; font-size: 11px; margin-left: 8px;">🩺 Vet</span>
+            {% endif %}
+          </div>
+          <p style="margin: 0 0 8px 0; color: #555; line-height: 1.5; white-space: pre-wrap;">{{ reply_body }}</p>
+          <span style="font-size: 11px; color: #999;">📅 {{ reply_date.strftime('%d %b %Y at %H:%M') if reply_date else '' }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p style="color: #999; text-align: center; padding: 30px;">No replies yet. Be the first to respond!</p>
+    {% endif %}
+
+    <!-- Reply Form -->
+    {% if session and session.get('user_id') and post %}
+    <form method="POST" action="/forum/reply" style="margin-top: 25px; padding-top: 25px; border-top: 1px solid #ddd;">
+      <input type="hidden" name="post_id" value="{{ post[0] }}">
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Your Reply</label>
+        <textarea name="body" rows="3" placeholder="Share your advice or experience..." required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit;"></textarea>
+      </div>
+      <button type="submit" style="background: #e0702a; color: white; border: none; padding: 10px 24px; border-radius: 8px; cursor: pointer; font-weight: 600;">Post Reply →</button>
+    </form>
+    {% elif not session or not session.get('user_id') %}
+    <div style="margin-top: 25px; text-align: center; padding-top: 25px; border-top: 1px solid #ddd;">
+      <a href="/login" style="background: #e0702a; color: white; text-decoration: none; padding: 10px 24px; border-radius: 30px;">Log in to reply</a>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

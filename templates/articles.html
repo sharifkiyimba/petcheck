@@ -1,0 +1,400 @@
+{% extends "base.html" %}
+{% block title %}Health Articles — PetCheck{% endblock %}
+
+{% block extra_css %}
+<style>
+  .articles-hero {
+    background: linear-gradient(135deg, rgba(224,112,42,0.08), rgba(33,107,94,0.08));
+    border-radius: 2rem;
+    padding: 3rem 2rem;
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+  
+  .articles-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+  }
+  
+  .articles-hero p {
+    color: #5a4e42;
+    font-size: 1.1rem;
+  }
+  
+  /* Category Tabs */
+  .category-tabs-modern {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 2.5rem;
+  }
+  
+  .cat-tab-modern {
+    background: white;
+    border: 1.5px solid #e8e0d5;
+    padding: 0.6rem 1.3rem;
+    border-radius: 60px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #5a4e42;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .cat-tab-modern:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
+  }
+  
+  .cat-tab-modern.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+  }
+  
+  /* Modern Article Cards Grid */
+  .articles-grid-modern {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+  }
+  
+  .article-card-modern {
+    background: white;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+  }
+  
+  .article-card-modern:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  }
+  
+  .article-image {
+    position: relative;
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+  }
+  
+  .article-image::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.3));
+    z-index: 1;
+  }
+  
+  .article-category {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 2;
+    background: var(--primary);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  
+  .article-content {
+    padding: 1.5rem;
+  }
+  
+  .article-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2a2418;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+  }
+  
+  .article-excerpt {
+    font-size: 0.9rem;
+    color: #5a4e42;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+  }
+  
+  .article-meta-modern {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #8b7e6e;
+    border-top: 1px solid #eee5db;
+    padding-top: 1rem;
+  }
+  
+  .read-more-modern {
+    color: var(--primary);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: gap 0.2s;
+  }
+  
+  .article-card-modern:hover .read-more-modern {
+    gap: 8px;
+  }
+  
+  .article-stats {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .article-stats span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  /* Featured Article */
+  .featured-article {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-radius: 1.5rem;
+    margin-bottom: 3rem;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .featured-content {
+    flex: 1;
+    padding: 2.5rem;
+    color: white;
+  }
+  
+  .featured-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 0.3rem 0.8rem;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+  
+  .featured-content h2 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+  }
+  
+  .featured-content p {
+    opacity: 0.9;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+  
+  .featured-btn {
+    background: white;
+    color: var(--primary);
+    padding: 0.75rem 1.5rem;
+    border-radius: 60px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+  
+  .featured-btn:hover {
+    transform: translateX(4px);
+    background: #f8f8f8;
+  }
+  
+  .featured-image {
+    flex: 0.8;
+    background-size: cover;
+    background-position: center;
+    min-height: 250px;
+  }
+  
+  @media (max-width: 768px) {
+    .featured-content h2 {
+      font-size: 1.4rem;
+    }
+    .featured-image {
+      min-height: 200px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="articles-page" style="max-width: 1280px; margin: 0 auto; padding: 2rem 5%;">
+  
+  <div class="articles-hero">
+    <h1>📚 Pet Health Library</h1>
+    <p>Expert-written guides on pet diseases, nutrition, and preventive care</p>
+  </div>
+  
+  <div class="category-tabs-modern">
+    <button class="cat-tab-modern active" data-cat="all">All Articles</button>
+    <button class="cat-tab-modern" data-cat="dogs">🐕 Dogs</button>
+    <button class="cat-tab-modern" data-cat="cats">🐈 Cats</button>
+    <button class="cat-tab-modern" data-cat="nutrition">🥗 Nutrition</button>
+    <button class="cat-tab-modern" data-cat="prevention">🛡️ Prevention</button>
+  </div>
+  
+  <!-- Featured Article -->
+  <div class="featured-article" id="featuredArticle">
+    <div class="featured-content">
+      <span class="featured-badge">⭐ Featured Article</span>
+      <h2>How to Spot Mange in Dogs Early</h2>
+      <p>Mange is a common skin disease caused by mites. Learn the early signs to look for and how to prevent it from spreading to other pets and family members.</p>
+      <a href="/articles/1" class="featured-btn">Read Full Article →</a>
+    </div>
+    <div class="featured-image" style="background-image: url('https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=500&h=300&fit=crop');"></div>
+  </div>
+  
+  <!-- Articles Grid -->
+  <div class="articles-grid-modern" id="articlesGrid"></div>
+  
+</section>
+
+<script>
+  const articlesData = [
+    {
+      id: 1,
+      title: "How to Spot Mange in Dogs Early",
+      excerpt: "Mange is a common skin disease caused by mites. Learn the early signs to look for and how to prevent it from spreading...",
+      category: "dogs",
+      image: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=400&h=250&fit=crop",
+      readTime: "4 min read",
+      date: "Jan 15, 2024"
+    },
+    {
+      id: 2,
+      title: "Eye Infections in Cats: Causes & Treatment",
+      excerpt: "Conjunctivitis is one of the most common conditions in cats. Discover what causes it and how to treat it at home safely...",
+      category: "cats",
+      image: "https://images.unsplash.com/photo-1574158622682-e40e69881006?w=400&h=250&fit=crop",
+      readTime: "3 min read",
+      date: "Jan 10, 2024"
+    },
+    {
+      id: 3,
+      title: "Feeding Your Dog the Right Diet in Uganda",
+      excerpt: "Many pet owners in Uganda feed their dogs table scraps. Find out which local foods are safe and which can be harmful...",
+      category: "nutrition",
+      image: "https://images.unsplash.com/photo-1569925930406-1f771b3c20f7?w=400&h=250&fit=crop",
+      readTime: "5 min read",
+      date: "Jan 5, 2024"
+    },
+    {
+      id: 4,
+      title: "Vaccination Schedule for Dogs & Cats",
+      excerpt: "Regular vaccinations are the most effective way to keep your pet healthy. Here is the recommended schedule for Uganda...",
+      category: "prevention",
+      image: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=400&h=250&fit=crop",
+      readTime: "4 min read",
+      date: "Dec 28, 2023"
+    },
+    {
+      id: 5,
+      title: "Understanding Ear Infections in Dogs",
+      excerpt: "Ear infections are painful and very common in dogs, especially those with floppy ears. Learn how to clean ears properly...",
+      category: "dogs",
+      image: "https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?w=400&h=250&fit=crop",
+      readTime: "3 min read",
+      date: "Dec 20, 2023"
+    },
+    {
+      id: 6,
+      title: "Ringworm in Cats: Is It Dangerous to Humans?",
+      excerpt: "Despite its name, ringworm is a fungal infection, not a worm. It can spread to humans. Here is what you need to know...",
+      category: "cats",
+      image: "https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?w=400&h=250&fit=crop",
+      readTime: "4 min read",
+      date: "Dec 15, 2023"
+    },
+    {
+      id: 7,
+      title: "Natural Supplements for Your Pet's Joint Health",
+      excerpt: "As pets age, joint problems become common. Discover natural supplements that can help maintain mobility and reduce pain...",
+      category: "nutrition",
+      image: "https://images.unsplash.com/photo-1551103782-8ab07afd45c1?w=400&h=250&fit=crop",
+      readTime: "6 min read",
+      date: "Dec 10, 2023"
+    },
+    {
+      id: 8,
+      title: "How to Pet-Proof Your Home: Safety Guide",
+      excerpt: "Many household items can be dangerous to pets. Learn how to create a safe environment for your furry friends...",
+      category: "prevention",
+      image: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=250&fit=crop",
+      readTime: "3 min read",
+      date: "Dec 5, 2023"
+    }
+  ];
+  
+  function renderArticles(category = 'all') {
+    const grid = document.getElementById('articlesGrid');
+    const filtered = category === 'all' ? articlesData : articlesData.filter(a => a.category === category);
+    
+    grid.innerHTML = filtered.map(article => `
+      <a href="/articles/${article.id}" class="article-card-modern">
+        <div class="article-image" style="background-image: url('${article.image}');">
+          <span class="article-category">${article.category.charAt(0).toUpperCase() + article.category.slice(1)}</span>
+        </div>
+        <div class="article-content">
+          <h3 class="article-title">${article.title}</h3>
+          <p class="article-excerpt">${article.excerpt}</p>
+          <div class="article-meta-modern">
+            <div class="article-stats">
+              <span><i class="far fa-clock"></i> ${article.readTime}</span>
+              <span><i class="far fa-calendar"></i> ${article.date}</span>
+            </div>
+            <span class="read-more-modern">Read more <i class="fas fa-arrow-right"></i></span>
+          </div>
+        </div>
+      </a>
+    `).join('');
+  }
+  
+  // Filter functionality
+  document.querySelectorAll('.cat-tab-modern').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.cat-tab-modern').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const category = btn.dataset.cat;
+      renderArticles(category);
+      
+      // Update featured article based on category
+      const featured = document.getElementById('featuredArticle');
+      if (category !== 'all') {
+        const featuredArticle = articlesData.find(a => a.category === category);
+        if (featuredArticle) {
+          featured.querySelector('.featured-content h2').textContent = featuredArticle.title;
+          featured.querySelector('.featured-content p').textContent = featuredArticle.excerpt;
+          featured.querySelector('.featured-content .featured-btn').href = `/articles/${featuredArticle.id}`;
+          featured.querySelector('.featured-image').style.backgroundImage = `url('${featuredArticle.image}')`;
+        }
+      } else {
+        const defaultFeatured = articlesData[0];
+        featured.querySelector('.featured-content h2').textContent = defaultFeatured.title;
+        featured.querySelector('.featured-content p').textContent = defaultFeatured.excerpt;
+        featured.querySelector('.featured-content .featured-btn').href = `/articles/${defaultFeatured.id}`;
+        featured.querySelector('.featured-image').style.backgroundImage = `url('${defaultFeatured.image}')`;
+      }
+    });
+  });
+  
+  // Initial render
+  renderArticles('all');
+</script>
+{% endblock %}
