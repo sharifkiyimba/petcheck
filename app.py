@@ -3,9 +3,9 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 from functools import wraps
+import os
 import psycopg2
 from psycopg2.extras import RealDictCursor
-import os
 from urllib.parse import urlparse
 
 load_dotenv()
@@ -14,10 +14,12 @@ app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'petcheck_secret_2024')
 
 # Database configuration for Render PostgreSQL
-DATABASE_URL = os.environ.get('DATABASE_URL', 'postgresql://postgres:password@localhost/petcheck')
+DATABASE_URL = os.environ.get('DATABASE_URL')
 
 def get_db_connection():
     """Get PostgreSQL database connection"""
+    if not DATABASE_URL:
+        raise ValueError("DATABASE_URL environment variable not set")
     url = urlparse(DATABASE_URL)
     conn = psycopg2.connect(
         host=url.hostname,
@@ -30,133 +32,139 @@ def get_db_connection():
 
 def init_db():
     """Initialize database tables (PostgreSQL version)"""
-    conn = get_db_connection()
-    cur = conn.cursor()
-    
-    # Users table
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id SERIAL PRIMARY KEY,
-            name VARCHAR(100) NOT NULL,
-            email VARCHAR(150) UNIQUE NOT NULL,
-            password VARCHAR(255) NOT NULL,
-            role VARCHAR(20) DEFAULT 'pet_owner',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    
-    # Pets table
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS pets (
-            id SERIAL PRIMARY KEY,
-            user_id INTEGER NOT NULL,
-            name VARCHAR(100) NOT NULL,
-            species VARCHAR(50) NOT NULL,
-            breed VARCHAR(100),
-            age INTEGER,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-        )
-    ''')
-    
-    # Diagnoses table
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS diagnoses (
-            id SERIAL PRIMARY KEY,
-            user_id INTEGER,
-            pet_id INTEGER,
-            image_path VARCHAR(255),
-            predicted_disease VARCHAR(200),
-            confidence FLOAT,
-            advice TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
-            FOREIGN KEY (pet_id) REFERENCES pets(id) ON DELETE SET NULL
-        )
-    ''')
-    
-    # Vets table
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS vets (
-            id SERIAL PRIMARY KEY,
-            name VARCHAR(150) NOT NULL,
-            clinic_name VARCHAR(200),
-            phone VARCHAR(20),
-            email VARCHAR(150),
-            location VARCHAR(255),
-            latitude DECIMAL(10, 8),
-            longitude DECIMAL(11, 8),
-            specialization VARCHAR(200),
-            available BOOLEAN DEFAULT TRUE,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    
-    # Articles table
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS articles (
-            id SERIAL PRIMARY KEY,
-            title VARCHAR(255) NOT NULL,
-            content TEXT NOT NULL,
-            category VARCHAR(100),
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    
-    # Forum posts table
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS forum_posts (
-            id SERIAL PRIMARY KEY,
-            user_id INTEGER,
-            title VARCHAR(255) NOT NULL,
-            body TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
-        )
-    ''')
-    
-    # Forum replies table
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS forum_replies (
-            id SERIAL PRIMARY KEY,
-            post_id INTEGER NOT NULL,
-            user_id INTEGER,
-            body TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (post_id) REFERENCES forum_posts(id) ON DELETE CASCADE,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
-        )
-    ''')
-    
-    # Insert sample vets if not exists
-    cur.execute("SELECT COUNT(*) FROM vets")
-    count = cur.fetchone()[0]
-    if count == 0:
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        # Users table
         cur.execute('''
-            INSERT INTO vets (name, clinic_name, phone, email, location, specialization, available) VALUES
-            ('Dr. Ssali James', 'Entebbe Veterinary Clinic', '+256700123456', 'james.ssali@vetclinic.ug', 'Division A, Entebbe', 'Dogs & Cats', TRUE),
-            ('Dr. Nakato Sarah', 'PetCare Entebbe', '+256782654321', 'sarah.nakato@petcare.ug', 'Division B, Entebbe', 'Small Animals', TRUE),
-            ('Dr. Mukasa David', 'Animal Health Center', '+256755987654', 'david.mukasa@animalhealth.ug', 'Kampala Rd, Entebbe', 'General Veterinary', TRUE)
+            CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                email VARCHAR(150) UNIQUE NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                role VARCHAR(20) DEFAULT 'pet_owner',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
         ''')
-    
-    # Insert sample articles if not exists
-    cur.execute("SELECT COUNT(*) FROM articles")
-    count = cur.fetchone()[0]
-    if count == 0:
+        
+        # Pets table
         cur.execute('''
-            INSERT INTO articles (title, content, category) VALUES
-            ('How to Spot Mange in Dogs Early', '<p>Mange is a common skin disease caused by mites...</p>', 'dogs'),
-            ('Eye Infections in Cats: Causes & Treatment', '<p>Conjunctivitis is common in cats...</p>', 'cats'),
-            ('Feeding Your Dog the Right Diet', '<p>Proper nutrition is important...</p>', 'nutrition')
+            CREATE TABLE IF NOT EXISTS pets (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER NOT NULL,
+                name VARCHAR(100) NOT NULL,
+                species VARCHAR(50) NOT NULL,
+                breed VARCHAR(100),
+                age INTEGER,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            )
         ''')
-    
-    conn.commit()
-    cur.close()
-    conn.close()
-    print("✅ Database initialized successfully!")
+        
+        # Diagnoses table
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS diagnoses (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER,
+                pet_id INTEGER,
+                image_path VARCHAR(255),
+                predicted_disease VARCHAR(200),
+                confidence FLOAT,
+                advice TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+                FOREIGN KEY (pet_id) REFERENCES pets(id) ON DELETE SET NULL
+            )
+        ''')
+        
+        # Vets table
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS vets (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(150) NOT NULL,
+                clinic_name VARCHAR(200),
+                phone VARCHAR(20),
+                email VARCHAR(150),
+                location VARCHAR(255),
+                latitude DECIMAL(10, 8),
+                longitude DECIMAL(11, 8),
+                specialization VARCHAR(200),
+                available BOOLEAN DEFAULT TRUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        # Articles table
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS articles (
+                id SERIAL PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                content TEXT NOT NULL,
+                category VARCHAR(100),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        # Forum posts table
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS forum_posts (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER,
+                title VARCHAR(255) NOT NULL,
+                body TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+            )
+        ''')
+        
+        # Forum replies table
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS forum_replies (
+                id SERIAL PRIMARY KEY,
+                post_id INTEGER NOT NULL,
+                user_id INTEGER,
+                body TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (post_id) REFERENCES forum_posts(id) ON DELETE CASCADE,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+            )
+        ''')
+        
+        # Insert sample vets if not exists
+        cur.execute("SELECT COUNT(*) FROM vets")
+        count = cur.fetchone()[0]
+        if count == 0:
+            cur.execute('''
+                INSERT INTO vets (name, clinic_name, phone, email, location, specialization, available) VALUES
+                ('Dr. Ssali James', 'Entebbe Veterinary Clinic', '+256700123456', 'james.ssali@vetclinic.ug', 'Division A, Entebbe', 'Dogs & Cats', TRUE),
+                ('Dr. Nakato Sarah', 'PetCare Entebbe', '+256782654321', 'sarah.nakato@petcare.ug', 'Division B, Entebbe', 'Small Animals', TRUE),
+                ('Dr. Mukasa David', 'Animal Health Center', '+256755987654', 'david.mukasa@animalhealth.ug', 'Kampala Rd, Entebbe', 'General Veterinary', TRUE)
+            ''')
+        
+        # Insert sample articles if not exists
+        cur.execute("SELECT COUNT(*) FROM articles")
+        count = cur.fetchone()[0]
+        if count == 0:
+            cur.execute('''
+                INSERT INTO articles (title, content, category) VALUES
+                ('How to Spot Mange in Dogs Early', '<p>Mange is a common skin disease caused by mites...</p>', 'dogs'),
+                ('Eye Infections in Cats: Causes & Treatment', '<p>Conjunctivitis is common in cats...</p>', 'cats'),
+                ('Feeding Your Dog the Right Diet', '<p>Proper nutrition is important...</p>', 'nutrition')
+            ''')
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+        print("✅ Database initialized successfully!")
+    except Exception as e:
+        print(f"Database initialization error: {e}")
 
 # Initialize database when app starts
-init_db()
+try:
+    init_db()
+except Exception as e:
+    print(f"Could not initialize database: {e}")
 
 app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER', 'uploads')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
