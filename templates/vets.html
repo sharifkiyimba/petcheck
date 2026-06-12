@@ -274,20 +274,27 @@
     {% if vets and vets|length > 0 %}
       {% for vet in vets %}
       <div class="vet-card" data-location="{{ vet.location }}" data-emergency="{{ vet.available }}">
-        <!-- Vet Image -->
+        
+        <!-- ========== VET IMAGE SECTION - PASTE YOUR IMAGE LINKS BELOW ========== -->
         <div class="vet-image-wrapper">
           {% if vet.name == 'Dr. Ssali James' %}
-            <img class="vet-image" src="{{ url_for('static', filename='images/DOCTOR_SSALI.jpg') }}" alt="{{ vet.name }}">
+            <!-- 👇 PASTE DR. SSALI JAMES IMAGE LINK HERE -->
+            <img class="vet-image" src="https://i.imgur.com/kOlgrJM.jpeg" alt="{{ vet.name }}">
           {% elif vet.name == 'Dr. Nakato Sarah' %}
-            <img class="vet-image" src="{{ url_for('static', filename='images/DOCTOR_SARAH.jpg') }}" alt="{{ vet.name }}">
+            <!-- 👇 PASTE DR. NAKATO SARAH IMAGE LINK HERE -->
+            <img class="vet-image" src="https://i.imgur.com/dL7RG2F.jpeg" alt="{{ vet.name }}">
           {% elif vet.name == 'Dr. Mukasa David' %}
-            <img class="vet-image" src="{{ url_for('static', filename='images/DOCTOR_MUKASA.jpg') }}" alt="{{ vet.name }}">
+            <!-- 👇 PASTE DR. MUKASA DAVID IMAGE LINK HERE -->
+            <img class="vet-image" src="https://i.imgur.com/RKGQdzB.jpeg" alt="{{ vet.name }}">
           {% elif vet.name == 'Dr. Aisha Nambi' %}
-            <img class="vet-image" src="{{ url_for('static', filename='images/DOCTOR_AISHA.jpg') }}" alt="{{ vet.name }}">
+            <!-- 👇 PASTE DR. AISHA NAMBI IMAGE LINK HERE -->
+            <img class="vet-image" src="https://i.imgur.com/VUfqIS5.jpeg" alt="{{ vet.name }}">
           {% elif vet.name == 'Dr. John Kayongo' %}
-            <img class="vet-image" src="{{ url_for('static', filename='images/DOCTOR_KAYONGO.jpg') }}" alt="{{ vet.name }}">
+            <!-- 👇 PASTE DR. JOHN KAYONGO IMAGE LINK HERE -->
+            <img class="vet-image" src="https://i.imgur.com/RKowoeA.jpeg" alt="{{ vet.name }}">
           {% elif vet.name == 'Dr. Grace Atim' %}
-            <img class="vet-image" src="{{ url_for('static', filename='images/DOCTOR_GRACE.jpg') }}" alt="{{ vet.name }}">
+            <!-- 👇 PASTE DR. GRACE ATIM IMAGE LINK HERE -->
+            <img class="vet-image" src="https://i.imgur.com/SpR2DFi.jpeg" alt="{{ vet.name }}">
           {% else %}
             <div class="vet-image-error">
               <i class="fas fa-user-md"></i>
@@ -297,6 +304,7 @@
           <span class="vet-badge">✅ Available</span>
           {% endif %}
         </div>
+        <!-- ========== END OF VET IMAGE SECTION ========== -->
         
         <div class="vet-info">
           <h3 class="vet-name">{{ vet.name }}</h3>
