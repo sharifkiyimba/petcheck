@@ -2,116 +2,210 @@
 {% block title %}Diagnose Your Pet — PetCheck{% endblock %}
 
 {% block content %}
-<section class="upload-page">
-  <div class="upload-header">
-    <h1>Upload Your Pet's Photo</h1>
-    <p>Supported: JPG, PNG · Max size: 16MB</p>
+<div class="upload-container" style="max-width: 700px; margin: 0 auto; padding: 40px 20px;">
+  
+  <div style="text-align: center; margin-bottom: 30px;">
+    <h1 style="font-size: 2rem; color: #1a1d26;">📸 Diagnose Your Pet</h1>
+    <p style="color: #666;">Upload a clear photo of your dog or cat for AI analysis</p>
   </div>
 
-  <div class="upload-container">
-    <!-- Drop zone -->
-    <div class="drop-zone" id="dropZone">
-      <div class="drop-icon">🐾</div>
-      <p class="drop-text">Drag & drop your pet's photo here</p>
-      <p class="drop-sub">or</p>
-      <label class="btn-primary" for="fileInput">Browse Files</label>
-      <input type="file" id="fileInput" accept="image/jpeg,image/png,image/jpg" hidden />
+  <!-- Upload Form -->
+  <div class="upload-box" style="background: white; border-radius: 24px; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+    
+    <!-- Drop Zone -->
+    <div id="dropZone" style="border: 2px dashed #e8e0d5; border-radius: 20px; padding: 50px 20px; text-align: center; cursor: pointer; transition: all 0.3s; background: #fef9f0;">
+      <div style="font-size: 4rem; margin-bottom: 10px;">🐾</div>
+      <p style="font-size: 1.1rem; font-weight: 600; margin-bottom: 5px;">Drag & drop your pet's photo here</p>
+      <p style="color: #999; margin-bottom: 15px;">or</p>
+      <label for="fileInput" style="background: #e0702a; color: white; padding: 10px 24px; border-radius: 50px; cursor: pointer; font-weight: 600; display: inline-block;">Browse Files</label>
+      <input type="file" id="fileInput" accept="image/jpeg,image/png,image/jpg" style="display: none;">
+      <p style="font-size: 0.75rem; color: #999; margin-top: 15px;">Supports: JPG, PNG · Max size: 16MB</p>
     </div>
 
-    <!-- Preview -->
-    <div class="preview-area" id="previewArea" style="display:none;">
-      <img id="previewImg" src="" alt="Preview" />
-      <div class="preview-actions">
-        <button class="btn-ghost" id="removeFile">✕ Remove</button>
-        <button class="btn-primary" id="analyzeBtn">Analyze Now →</button>
+    <!-- Preview Area -->
+    <div id="previewArea" style="display: none; margin-top: 20px;">
+      <div style="background: #f5f0e8; border-radius: 16px; padding: 20px; text-align: center;">
+        <img id="previewImg" src="" alt="Preview" style="max-width: 100%; max-height: 300px; border-radius: 12px; margin-bottom: 15px;">
+        <div style="display: flex; gap: 15px; justify-content: center;">
+          <button id="removeFile" style="background: #ccc; color: #333; border: none; padding: 10px 24px; border-radius: 50px; cursor: pointer; font-weight: 600;">Remove</button>
+          <button id="analyzeBtn" style="background: #e0702a; color: white; border: none; padding: 10px 24px; border-radius: 50px; cursor: pointer; font-weight: 600;">Analyze Now →</button>
+        </div>
       </div>
     </div>
 
-    <!-- Loading state -->
-    <div class="analyzing" id="analyzingState" style="display:none;">
-      <div class="paw-spinner">🐾</div>
-      <p>Analyzing your pet...</p>
-      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <!-- Loading State -->
+    <div id="loadingState" style="display: none; text-align: center; margin-top: 20px; padding: 40px;">
+      <div style="font-size: 3rem; animation: spin 1s linear infinite;">🐾</div>
+      <p style="margin-top: 15px; font-weight: 500;">Analyzing your pet...</p>
+      <div style="width: 100%; max-width: 300px; margin: 15px auto; height: 8px; background: #e8e0d5; border-radius: 4px; overflow: hidden;">
+        <div id="progressBar" style="width: 0%; height: 100%; background: #e0702a; transition: width 0.3s;"></div>
+      </div>
+      <p style="font-size: 0.8rem; color: #999;">This may take a few seconds</p>
     </div>
   </div>
 
-  <!-- Tips -->
-  <div class="upload-tips">
-    <h3>📸 Tips for a good photo</h3>
-    <ul>
-      <li>Make sure the affected area is clearly visible</li>
-      <li>Use good lighting — avoid blurry or dark images</li>
-      <li>Take the photo from multiple angles if possible</li>
-      <li>For skin issues, part the fur to show the skin</li>
-    </ul>
+  <!-- Tips Section -->
+  <div style="margin-top: 30px; background: #f5f0e8; border-radius: 20px; padding: 25px;">
+    <h3 style="margin-bottom: 15px;">📸 Tips for best results</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 1.5rem;">💡</span>
+        <span>Use good lighting</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 1.5rem;">📏</span>
+        <span>Show the affected area clearly</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 1.5rem;">📱</span>
+        <span>Hold your phone steady</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 1.5rem;">🐕</span>
+        <span>Make sure your pet is visible</span>
+      </div>
+    </div>
   </div>
-</section>
+
+  <!-- Info Box -->
+  <div style="margin-top: 20px; background: #e8f5e9; border-radius: 16px; padding: 15px; text-align: center; border-left: 4px solid #4caf50;">
+    <p style="font-size: 0.85rem; color: #2e7d32;">
+      <strong>🔬 How it works:</strong> Our AI analyzes your pet's photo for signs of common conditions including skin issues, eye infections, ear problems, wounds, and more.
+    </p>
+  </div>
+</div>
+
+<style>
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+</style>
 
 <script>
-const dropZone = document.getElementById('dropZone');
-const fileInput = document.getElementById('fileInput');
-const previewArea = document.getElementById('previewArea');
-const previewImg = document.getElementById('previewImg');
-const analyzingState = document.getElementById('analyzingState');
-const progressFill = document.getElementById('progressFill');
-let selectedFile = null;
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  const previewArea = document.getElementById('previewArea');
+  const previewImg = document.getElementById('previewImg');
+  const loadingState = document.getElementById('loadingState');
+  const progressBar = document.getElementById('progressBar');
+  let selectedFile = null;
 
-fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+  // Click to browse
+  dropZone.addEventListener('click', () => fileInput.click());
 
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault();
-  dropZone.classList.remove('dragover');
-  handleFile(e.dataTransfer.files[0]);
-});
+  // File input change
+  fileInput.addEventListener('change', (e) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFile(e.target.files[0]);
+    }
+  });
 
-function handleFile(file) {
-  if (!file) return;
-  selectedFile = file;
-  const reader = new FileReader();
-  reader.onload = e => {
-    previewImg.src = e.target.result;
-    dropZone.style.display = 'none';
-    previewArea.style.display = 'block';
-  };
-  reader.readAsDataURL(file);
-}
+  // Drag and drop
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.style.borderColor = '#e0702a';
+    dropZone.style.background = '#fff5ec';
+  });
 
-document.getElementById('removeFile').addEventListener('click', () => {
-  selectedFile = null;
-  fileInput.value = '';
-  previewArea.style.display = 'none';
-  dropZone.style.display = 'flex';
-});
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.style.borderColor = '#e8e0d5';
+    dropZone.style.background = '#fef9f0';
+  });
 
-document.getElementById('analyzeBtn').addEventListener('click', async () => {
-  if (!selectedFile) return;
-  previewArea.style.display = 'none';
-  analyzingState.style.display = 'flex';
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.style.borderColor = '#e8e0d5';
+    dropZone.style.background = '#fef9f0';
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  });
 
-  let progress = 0;
-  const interval = setInterval(() => {
-    progress += 10;
-    if (progress > 90) progress = 90;
-    progressFill.style.width = progress + '%';
-  }, 200);
-
-  const formData = new FormData();
-  formData.append('file', selectedFile);
-
-  try {
-    const response = await fetch('/diagnose', { method: 'POST', body: formData });
-    const result = await response.json();
-    clearInterval(interval);
-    progressFill.style.width = '100%';
-    setTimeout(() => { window.location.href = '/results'; }, 500);
-  } catch (err) {
-    clearInterval(interval);
-    alert('Error analyzing image. Please try again.');
-    analyzingState.style.display = 'none';
-    previewArea.style.display = 'block';
+  function handleFile(file) {
+    // Check file type
+    if (!file.type.match('image.*')) {
+      alert('Please upload an image file (JPG, PNG)');
+      return;
+    }
+    
+    // Check file size (16MB max)
+    if (file.size > 16 * 1024 * 1024) {
+      alert('File is too large. Maximum size is 16MB.');
+      return;
+    }
+    
+    selectedFile = file;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      previewImg.src = e.target.result;
+      dropZone.style.display = 'none';
+      previewArea.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
   }
-});
+
+  // Remove file
+  document.getElementById('removeFile').addEventListener('click', () => {
+    selectedFile = null;
+    fileInput.value = '';
+    previewArea.style.display = 'none';
+    dropZone.style.display = 'block';
+    dropZone.style.borderColor = '#e8e0d5';
+    dropZone.style.background = '#fef9f0';
+  });
+
+  // Analyze button
+  document.getElementById('analyzeBtn').addEventListener('click', async () => {
+    if (!selectedFile) return;
+    
+    // Show loading
+    previewArea.style.display = 'none';
+    loadingState.style.display = 'block';
+    
+    // Animate progress bar
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += 10;
+      if (progress >= 90) {
+        clearInterval(interval);
+        progress = 90;
+      }
+      progressBar.style.width = progress + '%';
+    }, 200);
+    
+    // Send to server
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    
+    try {
+      const response = await fetch('/diagnose', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const result = await response.json();
+      clearInterval(interval);
+      progressBar.style.width = '100%';
+      
+      if (result.error) {
+        // Show error message
+        alert('❌ ' + result.error + '\n\n' + (result.advice || 'Please try again with a clear photo of your pet.'));
+        loadingState.style.display = 'none';
+        previewArea.style.display = 'block';
+      } else {
+        // Success - redirect to results
+        setTimeout(() => {
+          window.location.href = '/results';
+        }, 800);
+      }
+    } catch (error) {
+      clearInterval(interval);
+      console.error('Error:', error);
+      alert('❌ Unable to analyze image.\n\nPlease check your internet connection and try again.');
+      loadingState.style.display = 'none';
+      previewArea.style.display = 'block';
+    }
+  });
 </script>
 {% endblock %}
