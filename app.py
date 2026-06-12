@@ -331,27 +331,27 @@ def diagnose():
     if 'file' not in request.files:
         return jsonify({'error': 'No file uploaded'}), 400
     file = request.files['file']
-    if file.filename == '' or not allowed_file(file.filename):
-        return jsonify({'error': 'Invalid file type'}), 400
+    if file.filename == '':
+        return jsonify({'error': 'No file selected'}), 400
+    
     filename = secure_filename(file.filename)
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(filepath)
+    
     from model.predict import predict_disease
     result = predict_disease(filepath)
-    if session.get('user_id'):
-        try:
-            conn = get_db_connection()
-            cur = conn.cursor()
-            cur.execute("INSERT INTO diagnoses (user_id, image_path, predicted_disease, confidence, advice) VALUES (%s, %s, %s, %s, %s)",
-                        (session['user_id'], filepath, result['disease'], result['confidence'], result['advice']))
-            conn.commit()
-            cur.close()
-            conn.close()
-        except Exception as e:
-            print(f"DB save error: {e}")
+    
+    # Store in session for results page
     session['last_result'] = result
-    return jsonify(result)
+    
+    # For AJAX requests
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify(result)
+    
+    # For form submissions
+    return redirect(url_for('results'))
+
 
 # Articles Routes
 @app.route('/articles')
