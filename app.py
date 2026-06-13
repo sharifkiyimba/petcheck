@@ -328,30 +328,60 @@ def add_pet():
 
 @app.route('/diagnose', methods=['POST'])
 def diagnose():
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file uploaded'}), 400
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'No file selected'}), 400
-    
-    filename = secure_filename(file.filename)
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    file.save(filepath)
-    
-    from model.predict import predict_disease
-    result = predict_disease(filepath)
-    
-    # Store in session for results page
-    session['last_result'] = result
-    
-    # For AJAX requests
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file uploaded', 'advice': 'Please select a photo of your pet.'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No file selected', 'advice': 'Please select a photo to upload.'}), 400
+        
+        # Check file type
+        if not allowed_file(file.filename):
+            return jsonify({
+                'error': 'Invalid file type', 
+                'advice': 'Please upload a JPG, PNG, or JPEG image of your pet.'
+            }), 400
+        
+        # Save file
+        filename = secure_filename(file.filename)
+        upload_folder = app.config['UPLOAD_FOLDER']
+        
+        # Create upload folder if it doesn't exist
+        if not os.path.exists(upload_folder):
+            os.makedirs(upload_folder)
+            print(f"Created upload folder: {upload_folder}")
+        
+        filepath = os.path.join(upload_folder, filename)
+        file.save(filepath)
+        print(f"File saved to: {filepath}")
+        
+        # Get prediction
+        from model.predict import predict_disease
+        result = predict_disease(filepath)
+        
+        # Store in session
+        session['last_result'] = result
+        
+        # Clean up file (optional)
+        try:
+            os.remove(filepath)
+        except:
+            pass
+        
         return jsonify(result)
-    
-    # For form submissions
-    return redirect(url_for('results'))
-
+        
+    except Exception as e:
+        print(f"Diagnose error: {e}")
+        return jsonify({
+            'success': False,
+            'error': 'server_error',
+            'disease': 'Error',
+            'confidence': 0,
+            'advice': f'Server error: {str(e)}. Please try again.',
+            'all_predictions': []
+        }), 500
+        
 
 # Articles Routes
 @app.route('/articles')
